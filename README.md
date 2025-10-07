@@ -26,6 +26,17 @@ conda env create -f environment.yml
 
 a) First of all, you have to add your UPDRS ratings file to ```input_files``` folder. Name of this file must be ```<dataset_identifier>_diagnostic.csv```. This ```<dataset_identifier>``` must be the same as you will use inside main notebook ```notebooks\Main.ipynb```
 
+This file must contain two columns, called *ID* and *UPDRS*, separated by comma "*,*".
+- *ID*: name of each video file, without extension
+- *UPDRS*: UPDRS rating per video
+```csv  
+ID,UPDRS
+video1,0
+video2,3
+...
+```
+
+
 b) Please, review ```lib\config.py```. Current variables fit the folder structure that it is shown under this project.
 
 c) Using MediaPipe, ```process_video``` function will generate the baseline kinematic measures time series. As result, these files are generated: 
