@@ -22,7 +22,7 @@ conda env create -f environment.yml
 
 ## Steps 
 
-```notebooks\Main.ipynb``` provides step-by-step instructions for preprocessing data.
+```notebooks\Main.ipynb``` provides step-by-step instructions for processing data.
 
 a) First of all, you have to add your UPDRS ratings file to ```input_files``` folder. Name of this file must be ```<dataset_identifier>_diagnostic.csv```. This ```<dataset_identifier>``` must be the same as you will use inside main notebook ```notebooks\Main.ipynb```
 
