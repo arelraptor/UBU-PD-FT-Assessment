@@ -1,8 +1,27 @@
 # Artificial Intelligence for Parkinson's Disease Evaluation: an experimental study on finger tapping
 
+## Description
+
 This repository is the official implementation of: (future link to the paper)
 
 <img src="data/StepsFTinCV.png" width="900">
+
+Here, you can find the code for performing an experimental study using finger tapping videos. In the next sections, you can find the steps to configure and use the code that is present in this repository.
+
+## Dataset
+
+Dataset for FIS videos is available at https://zenodo.org/records/17738775. 
+
+This dataset contains 234 video recordings of controls and patients (individuals diagnosed with Parkinson’s disease) performing the standardized finger tapping test, a commonly used motor assessment in clinical and research settings. The videos were collected as part of a collaborative study conducted by researchers from the University of Burgos and the Hospital Universitario de Burgos. This work was supported by the project PI19/00670 of the Ministerio de Ciencia, Innovación y Universidades, Instituto de Salud Carlos III, Spain.
+
+The dataset is intended to support research on motor symptom characterization, quantitative assessment methods, and the development of automated analysis tools for Parkinson’s disease. All recordings were obtained following appropriate ethical approvals, and participants provided informed consent for research use of their data.
+
+All the participants and the Parkinson's Disease Association are thanked for their support. Similarly, we thank Dr. Gamez Leiva and Dr. Madrigal for the videos assessments.
+
+The structure of the zip file is:
+
+- fis_diagnostic.csv. Table with two columns, the first one is the name of the video and the second one the UPDRS rating for the clip.
+- videos. Folder with 234 videos (left and right hands).
 
 ## Requirements
 
