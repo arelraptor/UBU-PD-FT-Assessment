@@ -23,6 +23,10 @@ The structure of the zip file is:
 - fis_diagnostic.csv. Table with two columns, the first one is the name of the video and the second one the UPDRS rating for the clip.
 - videos. Folder with 234 videos (left and right hands).
 
+## Code Information
+
+This code has been written in Python and a Jupyter Notebook is also used for running the pipeline. In te sections below, you can find the requerirements and how to use this code.
+
 ## Requirements
 
 In this project you can find two different files for recreating the conda environment:
@@ -39,7 +43,7 @@ b) To import full environment, run:
 conda env create -f environment.yml
 ```
 
-## Steps 
+## Usage Instructions 
 
 ```notebooks\Main.ipynb``` provides step-by-step instructions for processing data.
 
