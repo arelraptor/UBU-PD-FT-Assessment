@@ -23,7 +23,7 @@ The structure of the zip file is:
 - fis_diagnostic.csv. Table with two columns, the first one is the name of the video and the second one the UPDRS rating for the clip.
 - videos. Folder with 234 videos (left and right hands).
 
-## Methodology Workflow
+## Classification Workflow
 
 The following diagram illustrates the nested cross-validation pipeline used in this study to ensure robust model evaluation and hyperparameter tuning.
 
