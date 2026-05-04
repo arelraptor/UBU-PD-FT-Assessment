@@ -23,6 +23,41 @@ The structure of the zip file is:
 - fis_diagnostic.csv. Table with two columns, the first one is the name of the video and the second one the UPDRS rating for the clip.
 - videos. Folder with 234 videos (left and right hands).
 
+## Methodology Workflow
+
+The following diagram illustrates the nested cross-validation pipeline used in this study to ensure robust model evaluation and hyperparameter tuning.
+
+![Methodology Workflow](data/fullProcess_v2.png)
+
+### 1. Input Data
+The process begins with the original **Dataset ($N$ samples)**. Due to the nature of the data, a rigorous validation strategy is employed to prevent overfitting and provide an unbiased estimate of model performance.
+
+### 2. Outer Loop: Leave-One-Out Cross-Validation
+To maximize the use of available data, an **Outer Loop** utilizing **Leave-one-out CV** is implemented:
+* **Train fold:** $N-1$ samples are used for training and hyperparameter optimization.
+* **Test fold:** 1 sample is held out for independent evaluation.
+* **Repetition:** This cycle is repeated $N$ times, ensuring every sample in the dataset is used as a test set exactly once.
+
+### 3. Classifiers & Inner Loop (Hyperparameter Tuning)
+For each iteration of the outer loop, the training data is passed to six different classification algorithms:
+* **Linear Regression**
+* **k-Nearest Neighbors (kNN)**
+* **Decision Tree**
+* **Random Forest**
+* **AdaBoost**
+* **XGBoost**.
+
+Within the **Inner Loop**, we perform **GridSearchCV** to identify the best parameters for each model. The optimization process uses the **Matthews Correlation Coefficient (MCC)** as the primary scoring metric to be maximized, ensuring balanced performance across all classes.
+
+### 4. Output and Evaluation Metrics
+Once the optimal models are determined and tested against the held-out samples, the final performance is aggregated. The pipeline outputs a comprehensive set of evaluation metrics:
+* **MCC** 
+* **F1-Score**
+* **Accuracy**
+* **A-AC** (Acceptable Accuracy)
+* **Precision**
+* **Recall**
+
 ## Code Information
 
 This code has been written in Python and a Jupyter Notebook is also used for running the pipeline. In te sections below, you can find the requirements and how to use this code.
@@ -81,6 +116,7 @@ e) Finally, function ```classify_video``` performs machine learning models train
 - ```result_files\<dataset_identifier>_<features_type>_result.csv```: shows a detailed report for each iteration.
 - ```result_files\<dataset_identifier>_<features_type>_execution_summary.csv```: this files provides a summary of each algorithm’s performance and the global outcome for each evaluated metric.
 - ```result_files\confusion_matrix\<dataset_identifier>_<features_type>_cm_<ml_algorithm>.png```: final confusion matrix for each evaluated algorithm.
+- ```result_files\roc_curves\<dataset_identifier>_<features_type>_roc_<ml_algorithm>.png```: roc curves for each evaluated algorithm.
 
 ## References
 
