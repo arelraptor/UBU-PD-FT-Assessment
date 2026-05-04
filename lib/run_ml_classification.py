@@ -6,8 +6,14 @@ from . import ml_models as m2t
 
 from matplotlib import pyplot as plt
 
+from sklearn.metrics import RocCurveDisplay
+from sklearn.preprocessing import label_binarize
+
+import pickle
+
+
 from sklearn.model_selection import LeaveOneOut,GridSearchCV,RepeatedStratifiedKFold
-from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef,roc_auc_score, confusion_matrix,ConfusionMatrixDisplay,cohen_kappa_score
+from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef,roc_auc_score, confusion_matrix,ConfusionMatrixDisplay,cohen_kappa_score,precision_score, recall_score
 
 from datetime import datetime
 
@@ -122,7 +128,13 @@ def classify_video(dataset_identifier,features_type):
             if hasattr(gridS.best_estimator_, "predict_proba"):
                 y_proba = gridS.predict_proba(final_x_array[test_loo])
                 conf_matrix_data[model_name]['y_proba'].extend(y_proba)
-
+    
+    # Save Pickle with all predictions
+    pickle_filename = f"{config.results_files_dir}pickle/{dataset_identifier}_{features_type}_raw_data.pkl"
+    with open(pickle_filename, 'wb') as f:
+        pickle.dump(conf_matrix_data, f)
+    
+    
     for model_name, data in conf_matrix_data.items():
         y_true_total = np.array(data['y_true'])
         y_pred_total = np.array(data['y_pred'])
@@ -132,9 +144,15 @@ def classify_video(dataset_identifier,features_type):
         disp = ConfusionMatrixDisplay(confusion_matrix=cm_total)
         fig, ax = plt.subplots(figsize=(8, 8))
         disp.plot(ax=ax, cmap='Blues', colorbar=False)
-        ax.set_title(f"{dataset_identifier}_{features_type}_{model_name} Agg", fontsize=14)
+        for text in disp.text_.ravel():
+            text.set_fontsize(16)
+            
+        ax.set_ylabel('Actual label', fontsize=16)
+        ax.set_xlabel('Predicted label', fontsize=16)
+        ax.tick_params(axis='both', which='major', labelsize=16)
         # Save figure
         final_cm_filename = f"{config.results_files_dir}confusion_matrix/{dataset_identifier}_{features_type}_cm_{model_name}.png"
+        plt.tight_layout()
         plt.savefig(final_cm_filename)
         plt.close()
 
@@ -151,6 +169,9 @@ def classify_video(dataset_identifier,features_type):
         kappa = cohen_kappa_score(y_true_total, y_pred_total)
         f1 = f1_score(y_true_total, y_pred_total, average='weighted')
         mcc = matthews_corrcoef(y_true_total, y_pred_total)
+        
+        precision = precision_score(y_true_total, y_pred_total, average='weighted')
+        recall = recall_score(y_true_total, y_pred_total, average='weighted')
         
         # Percentage acceptable predict
         substraction = np.abs(y_true_total - y_pred_total)
@@ -173,7 +194,9 @@ def classify_video(dataset_identifier,features_type):
             "Kappa_score": kappa,
             "F1_score": f1,
             "MCC": mcc,
-            "ROC_AUC": roc_auc
+            "ROC_AUC": roc_auc,
+            "Precision": precision,
+            "Recall": recall      
         })
 
     # Convert to DataFrame
@@ -186,3 +209,41 @@ def classify_video(dataset_identifier,features_type):
     summary_df.to_csv(summary_filename, index=False,sep=';')
     
     final_result.to_csv(config.results_files_dir+dataset_identifier+"_"+features_type+"_result.csv",sep=';')
+    
+    #Save ROC curves    
+    for model_name, data in conf_matrix_data.items():
+        y_true_total = np.array(data['y_true'])
+        y_proba_total = np.array(data['y_proba'])
+    
+        # Identify unique classes
+        classes = np.unique(y_true_total)
+        n_classes = len(classes)
+
+        # Binarize labels for multi-class calculation (One-vs-Rest)
+        y_true_binarized = label_binarize(y_true_total, classes=classes)
+
+        fig, ax = plt.subplots(figsize=(8, 8))
+
+        # Plot a curve for each class
+        for i in range(n_classes):
+            RocCurveDisplay.from_predictions(
+                y_true_binarized[:, i],
+                y_proba_total[:, i],
+                name=f"Class {classes[i]} vs Rest",
+                ax=ax,
+                plot_chance_level=(i == n_classes - 1),
+            )
+
+        # Customization
+        ax.set_xlabel("False Positive Rate", fontsize=16)
+        ax.set_ylabel("True Positive Rate", fontsize=16)
+        ax.tick_params(axis='both', which='major', labelsize=16)
+
+        plt.legend(loc="lower right", fontsize=13)
+        plt.tight_layout()
+
+        # Save ROC curve figure
+        final_roc_filename = f"{config.results_files_dir}roc_curves/{dataset_identifier}_{features_type}_roc_{model_name}.png"
+        plt.savefig(final_roc_filename)
+        plt.close()
+
